@@ -1,20 +1,43 @@
-import tweepy as tw
+import requests
 import pandas as pd
-import json
-from datetime import datetime
-import s3fs
 
-access_key = "ooVUGR8NK0oFyoWZwZCZxMcxB"
-access_secret = "Gcf9L1cmajm1HPYcLUv7vrMoy7ZA2BmEWu8xrdBbSvzljU2tCw"
-consumer_key = "791691396826689536-ZWF7vGci8v49Y0gbs301PYk7vBt6Bd5"
-cosumer_secret= "0VI2e3y9FpIscCkND123W0c5N4ZtbJOUcCRgM4pqSRryi"
+# Define your News API key
+api_key = '5532fc51053a4796a6cd6dd7b2627cc4'  # Replace with your News API key
 
-aut = tw.OAuthHandler(consumer_key, cosumer_secret)
-aut.set_access_token(access_key, access_secret)
-api = tw.API(aut)
+def fetch_top_headlines(api_key, country='us', page_size=20):
+    url = f'https://newsapi.org/v2/top-headlines?country={country}&pageSize={page_size}&apiKey={api_key}'
+    response = requests.get(url)
 
-tweets = api.user_timeline(
-    screen_name='@elonmusk', 
-    count=200, 
-    tweet_mode='extended'
-    )
+    if response.status_code == 200:
+        articles = response.json().get('articles', [])
+        articles_list = []
+
+        for article in articles:
+            # Extract relevant information from each article
+            article_info = {
+                'title': article.get('title', 'No Title'),
+                'description': article.get('description', 'No Description'),
+                'url': article.get('url', 'No URL'),
+                'publishedAt': article.get('publishedAt', 'No Date')
+            }
+            # Append article info to the list
+            articles_list.append(article_info)
+
+        return articles_list
+    else:
+        print(f"Failed to fetch data: {response.status_code}")
+        return []
+
+# Fetch and print top headlines with a custom page size
+if __name__ == "__main__":
+    page_size = 100  # Specify the number of articles you want (up to 100)
+    headlines = fetch_top_headlines(api_key, page_size=page_size)
+    for article in headlines:
+        print(f"Title: {article['title']}")
+        print(f"Description: {article['description']}")
+        print(f"URL: {article['url']}")
+        print(f"Published At: {article['publishedAt']}")
+        print("-" * 40)
+
+df = pd.DataFrame(headlines)
+df.to_csv('news.csv', index=False)
