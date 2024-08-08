@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 from datetime import timedelta
-from reddit_etl import etl_process  
+from news_etl import etl_process  
 
 # Define default_args and the DAG
 default_args = {

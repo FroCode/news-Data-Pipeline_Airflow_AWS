@@ -1,0 +1,10 @@
+ssh -i "etl_air_key.pem" ubuntu@ec2-3-78-229-84.eu-central-1.compute.amazonaws.com
+source myenv/bin/activate
+airflow users reset-password --username admin --password newpassword
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+sudo lsof -i :8080
+airflow webserver -p 8080 --hostname 0.0.0.0
+airflow scheduler
+sudo kill -9 1234
+
